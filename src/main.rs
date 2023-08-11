@@ -4,13 +4,15 @@
 mod ass_main;
 mod dis_main;
 mod file_input_util;
-mod file_output_util;
-mod lib;
+pub mod file_output_util;
+pub mod lib;
 
 use std::str;
 use std::thread;
 
 use clap::{Parser, Subcommand};
+
+pub use zip;
 
 use ass_main::assembler_main;
 use ass_main::AssemblerCli;

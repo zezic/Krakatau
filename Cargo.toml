@@ -19,3 +19,7 @@ anyhow = "1.0.70"
 [[bin]]
 name = "krak2"
 path = "src/main.rs"
+
+[lib]
+name = "krakatau2"
+path = "src/main.rs"

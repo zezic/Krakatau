@@ -65,12 +65,12 @@ impl<'a> Writer<'a> {
                     anyhow!("Class has missing or invalid name. Try specifying a single file output name explicitly.")
                 })?;
                 let options = zip::write::FileOptions::default()
-                    .compression_method(zip::CompressionMethod::Stored)
+                    .compression_method(zip::CompressionMethod::Deflated)
                     .last_modified_time(zip::DateTime::default());
 
                 zw.start_file(name, options)?;
                 zw.write_all(data)?;
-                println!("Wrote {} bytes to {} in {}", data.len(), name, p.display());
+                // println!("Wrote {} bytes to {} in {}", data.len(), name, p.display());
             }
             Merged(p, f) => {
                 write(p, f, data)?;

@@ -1,6 +1,6 @@
 mod assemble;
-mod classfile;
-mod disassemble;
+pub mod classfile;
+pub mod disassemble;
 mod mhtags;
 mod util;
 
