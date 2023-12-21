@@ -10,13 +10,14 @@ use crate::lib::classfile::cpool::Const;
 use crate::lib::classfile::cpool::ConstPool;
 use crate::lib::mhtags::MHTAGS;
 
-struct UtfData<'a> {
+#[derive(Debug)]
+pub struct UtfData<'a> {
     stype: StrLitType,
-    s: Cow<'a, str>,
+    pub s: Cow<'a, str>,
     use_count: Cell<u8>,
 }
 impl<'a> UtfData<'a> {
-    fn to_lit(&'a self) -> StringLit<'a> {
+    pub fn to_lit(&'a self) -> StringLit<'a> {
         let s = self.s.as_ref();
         StringLit { stype: self.stype, s }
     }
@@ -34,7 +35,7 @@ impl<'a> UtfData<'a> {
     }
 }
 
-pub(super) struct StringLit<'a> {
+pub struct StringLit<'a> {
     stype: StrLitType,
     s: &'a str,
 }
@@ -49,7 +50,7 @@ impl Display for StringLit<'_> {
     }
 }
 
-pub(super) enum RefOrString<'a> {
+pub enum RefOrString<'a> {
     Raw(u16),
     Sym(u16),
     RawBs(u16),
@@ -78,7 +79,7 @@ pub enum SingleTag {
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
-enum PrimTag {
+pub enum PrimTag {
     Int,
     Long,
     Float,
@@ -86,19 +87,20 @@ enum PrimTag {
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
-enum FmimTag {
+pub enum FmimTag {
     Field,
     Method,
     InterfaceMethod,
 }
 
 #[derive(PartialEq, Eq, Clone, Copy, Debug)]
-enum DynTag {
+pub enum DynTag {
     Dynamic,
     InvokeDynamic,
 }
 
-enum ConstData<'a> {
+#[derive(Debug)]
+pub enum ConstData<'a> {
     Invalid,
     Utf8(UtfData<'a>),
     Prim(PrimTag, String),
@@ -173,8 +175,9 @@ impl<'a> ConstData<'a> {
     }
 }
 
-struct ConstLine<'a> {
-    data: ConstData<'a>,
+#[derive(Debug)]
+pub struct ConstLine<'a> {
+    pub data: ConstData<'a>,
     force_raw: bool,
     is_defined: Cell<bool>, // used during printing at the end
     sym_used: Cell<bool>,
@@ -190,13 +193,14 @@ impl<'a> ConstLine<'a> {
     }
 }
 
-pub(super) struct RefPrinter<'a> {
+#[derive(Debug)]
+pub struct RefPrinter<'a> {
     roundtrip: bool,
-    cpool: Vec<ConstLine<'a>>,
+    pub cpool: Vec<ConstLine<'a>>,
     bs: &'a [BootstrapMethod],
 }
 impl<'a> RefPrinter<'a> {
-    pub(super) fn new(
+    pub fn new(
         roundtrip: bool,
         cp: &ConstPool<'a>,
         bs: Option<&'a [BootstrapMethod]>,
@@ -227,7 +231,7 @@ impl<'a> RefPrinter<'a> {
         new
     }
 
-    fn get(&self, ind: u16) -> Option<&ConstData<'a>> {
+    pub fn get(&self, ind: u16) -> Option<&ConstData<'a>> {
         if let Some(ConstLine {
             data, force_raw: false, ..
         }) = self.cpool.get(ind as usize)
@@ -251,7 +255,7 @@ impl<'a> RefPrinter<'a> {
         Sym(ind)
     }
 
-    pub(super) fn cpref(&self, ind: u16) -> RefOrString {
+    pub fn cpref(&self, ind: u16) -> RefOrString {
         if let Some(_) = self.get(ind) {
             self.symref(ind)
         } else {
@@ -259,7 +263,7 @@ impl<'a> RefPrinter<'a> {
         }
     }
 
-    pub(super) fn utf(&self, ind: u16) -> RefOrString {
+    pub fn utf(&self, ind: u16) -> RefOrString {
         if let Some(ConstData::Utf8(d)) = self.get(ind) {
             if let Some(sl) = d.ident() {
                 Str(sl)
@@ -286,7 +290,7 @@ impl<'a> RefPrinter<'a> {
         }
     }
 
-    pub(super) fn cls(&self, ind: u16) -> RefOrString {
+    pub fn cls(&self, ind: u16) -> RefOrString {
         self.single(ind, SingleTag::Class)
     }
 
@@ -304,7 +308,7 @@ impl<'a> RefPrinter<'a> {
         })
     }
 
-    pub(super) fn tagged_fmim(&self, ind: u16) -> impl Display + '_ {
+    pub fn tagged_fmim(&self, ind: u16) -> impl Display + '_ {
         LazyPrint(move |f: &mut fmt::Formatter| {
             if let Some(ConstData::Fmim(tag, c, nat)) = self.get(ind) {
                 write!(f, "{:?} {} {}", *tag, self.cls(*c), self.nat(*nat))
@@ -381,7 +385,7 @@ impl<'a> RefPrinter<'a> {
     }
 
     #[allow(unused)]
-    pub(super) fn tagged_const(&self, ind: u16) -> impl Display + '_ {
+    pub fn tagged_const(&self, ind: u16) -> impl Display + '_ {
         LazyPrint(move |f: &mut fmt::Formatter| {
             if let Some(c) = self.get(ind) {
                 self.tagged_const_sub(f, c)
@@ -412,7 +416,7 @@ impl<'a> RefPrinter<'a> {
         }
     }
 
-    pub(super) fn ldc(&self, ind: u16) -> impl Display + '_ {
+    pub fn ldc(&self, ind: u16) -> impl Display + '_ {
         LazyPrint(move |f: &mut fmt::Formatter| {
             if let Some(c) = self.get(ind) {
                 self.ldcrhs_sub(f, ind, c)

@@ -12,7 +12,7 @@ pub struct CodeOptions {
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug)]
-pub struct Pos(u32);
+pub struct Pos(pub u32);
 impl Pos {
     fn off_sub(self, off: i32) -> Result<Self, ParseError> {
         match (self.0 as i64)
@@ -25,7 +25,7 @@ impl Pos {
         }
     }
 
-    fn off(self, off: impl Into<i32>) -> Result<Self, ParseError> {
+    pub fn off(self, off: impl Into<i32>) -> Result<Self, ParseError> {
         self.off_sub(off.into())
     }
 
@@ -214,7 +214,7 @@ impl Display for NewArrayTag {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum WideInstr {
     Iload(u16),
     Lload(u16),
@@ -252,7 +252,7 @@ impl WideInstr {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Instr {
     Nop,
     AconstNull,

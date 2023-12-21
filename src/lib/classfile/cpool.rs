@@ -1,6 +1,6 @@
 use super::reader::ParseError;
 use super::reader::Reader;
-use crate::lib::util::BStr;
+pub use crate::lib::util::BStr;
 
 #[derive(Debug)]
 pub enum Const<'a> {

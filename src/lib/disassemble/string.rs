@@ -58,7 +58,7 @@ fn is_word(s: &str) -> bool {
     WORD_RE.is_match(s) && !ALL_FLAGS.contains(&s)
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum StrLitType {
     Unquoted,
     Regular,
