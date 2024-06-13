@@ -148,7 +148,7 @@ impl<'a> ErrorPrinter<'a> {
 }
 
 #[derive(Debug)]
-pub struct Error(Vec<(String, SpanBounds)>);
+pub struct Error(pub Vec<(String, SpanBounds)>);
 impl Error {
     pub fn new(source: &str, pairs: Vec<(&str, Span<'_>)>) -> Self {
         Self(
